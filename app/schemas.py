@@ -1,20 +1,19 @@
+from typing import Optional
 from pydantic import BaseModel,EmailStr
 from datetime import datetime
 
+from sqlalchemy.engine import base
 
-class ResponseBase(BaseModel):
-    id: int
-    title:str
+from app.database import Base
+from app.models import User
+
+class Post(BaseModel):
+    title: str
     content:str
-    published:bool
-    created_at: datetime
+    published: bool = True
 
-    class Config:
-        orm_mode = True
-
-class UserCreate(BaseModel):
-    email: EmailStr
-    password:str
+class PostCreateResponse(BaseModel):
+    pass
 
 class UserOut(BaseModel):
     id:str
@@ -23,3 +22,33 @@ class UserOut(BaseModel):
 
     class Config:
         orm_mode = True
+        
+class ResponseBase(BaseModel):
+    id: int
+    owner_id:int
+    title:str
+    content:str
+    published:bool
+    created_at: datetime
+    owner: UserOut
+
+    class Config:
+        orm_mode = True
+
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password:str
+
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password:str
+
+class Token(BaseModel):
+    access_token:str
+    token_type:str
+
+class TokenData(BaseModel):
+    id:Optional[str]=None
