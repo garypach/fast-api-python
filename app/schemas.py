@@ -1,8 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel,EmailStr
 from datetime import datetime
+from pydantic.types import conint
 
 from sqlalchemy.engine import base
+from starlette.responses import Response
 
 from app.database import Base
 from app.models import User
@@ -22,7 +24,8 @@ class UserOut(BaseModel):
 
     class Config:
         orm_mode = True
-        
+
+
 class ResponseBase(BaseModel):
     id: int
     owner_id:int
@@ -34,6 +37,10 @@ class ResponseBase(BaseModel):
 
     class Config:
         orm_mode = True
+
+class PostOut(BaseModel):
+    Post:ResponseBase
+    votes:int
 
 
 class UserCreate(BaseModel):
@@ -52,3 +59,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id:Optional[str]=None
+
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(le=1)

@@ -3,21 +3,17 @@ from fastapi.params import Depends
 from fastapi.routing import APIRouter
 from pydantic import BaseModel
 from random import randrange
-import psycopg2
 from sqlalchemy.orm.session import Session
+from sqlalchemy.sql.functions import func, mode
 from starlette.status import HTTP_403_FORBIDDEN
 from app import oAuth2
-from userpass import user
-from userpass import password
-import time
+from sqlalchemy import func
 from .. import models,schemas,utils,oAuth2
 from ..database import engine, get_db
 from typing import Optional, List
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"],deprecated="auto")
-
-models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter(
     prefix="/posts",
@@ -56,12 +52,13 @@ class Post(BaseModel):
 #         if p['id'] == id:
 #             return i
 
-@router.get("/",  response_model= List [schemas.ResponseBase])
-async def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
+# @router.get("/",  response_model= List[schemas.PostOut])
+@router.get("/",  response_model= List[schemas.PostOut])
+async def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user), limit:int = 10, skip:int = 0, search: Optional[str]=""):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
-    posts = db.query(models.Post).all()
-    return posts
+    results = db.query(models.Post,func.count(models.Vote.post_id).label("votes")).join(models.Vote,models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    return results
 
 @router.post("/", status_code= status.HTTP_201_CREATED, response_model= schemas.ResponseBase)
 async def create_posts(post:Post, db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
@@ -80,7 +77,7 @@ async def create_posts(post:Post, db: Session = Depends(get_db), current_user: i
 def get_post(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
     # cursor.execute("""SELECT * from posts WHERE id = %s""" , (str(id)))
     # post = cursor.fetchone()
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    post = db.query(models.Post,func.count(models.Vote.post_id).label("votes")).join(models.Vote,models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"post with id: {id} was not found")
     return post
