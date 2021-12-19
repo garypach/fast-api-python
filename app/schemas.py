@@ -18,7 +18,7 @@ class PostCreateResponse(BaseModel):
     pass
 
 class UserOut(BaseModel):
-    id:str
+    id:int
     email: EmailStr
     created_at: datetime
 
