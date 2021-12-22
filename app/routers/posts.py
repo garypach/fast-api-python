@@ -73,8 +73,15 @@ async def create_posts(post:Post, db: Session = Depends(get_db), current_user: i
     db.refresh(new_post)
     return new_post
 
+#get current user posts
+@router.get("/userposts",status_code= status.HTTP_200_OK)
+def get_user_post(db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
+    post_query = db.query(models.Post,func.count(models.Vote.post_id).label("votes")).join(models.Vote,models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.owner_id == current_user.id)
+    post = post_query.all()
+    return post
+
 @router.get("/{id}")
-def get_post(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
+def get_one_post(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
     # cursor.execute("""SELECT * from posts WHERE id = %s""" , (str(id)))
     # post = cursor.fetchone()
     post = db.query(models.Post,func.count(models.Vote.post_id).label("votes")).join(models.Vote,models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).first()
