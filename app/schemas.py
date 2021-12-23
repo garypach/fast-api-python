@@ -25,6 +25,28 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
 
+class Comments(BaseModel):
+    content:str  
+    post_id:int
+ 
+
+class CommentsResponseBase(BaseModel):
+    id: int
+    post_id: int
+    owner_id:int
+    content:str
+    created_at: datetime
+    owner: UserOut
+
+    class Config:
+        orm_mode = True
+
+
+class CommentsOut(BaseModel):
+    Comment:CommentsResponseBase
+
+
+    
 
 class ResponseBase(BaseModel):
     id: int
@@ -40,6 +62,7 @@ class ResponseBase(BaseModel):
 
 class PostOut(BaseModel):
     Post:ResponseBase
+    comments:str
     votes:int
 
 
