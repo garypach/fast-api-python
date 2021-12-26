@@ -26,12 +26,14 @@ class UserOut(BaseModel):
         orm_mode = True
 
 class Comments(BaseModel):
+    title:str
     content:str  
     post_id:int
  
 
 class CommentsResponseBase(BaseModel):
     id: int
+    title:str
     post_id: int
     owner_id:int
     content:str
@@ -62,7 +64,6 @@ class ResponseBase(BaseModel):
 
 class PostOut(BaseModel):
     Post:ResponseBase
-    comments:str
     votes:int
 
 

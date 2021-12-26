@@ -84,7 +84,7 @@ def get_user_post(db: Session = Depends(get_db), current_user: int = Depends(oAu
 def get_one_post(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
     # cursor.execute("""SELECT * from posts WHERE id = %s""" , (str(id)))
     # post = cursor.fetchone()
-    post = db.query(models.Post,func.count(models.Vote.post_id).label("votes"),models.Comment.content.label("comments")).join(models.Comment,models.Comment.post_id == models.Post.id, isouter=True).join(models.Vote,models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).first()
+    post = db.query(models.Post,func.count(models.Vote.post_id).label("votes")).join(models.Vote,models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"post with id: {id} was not found")
     return post
