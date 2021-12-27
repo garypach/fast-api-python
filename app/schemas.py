@@ -29,6 +29,7 @@ class Comments(BaseModel):
     title:str
     content:str  
     post_id:int
+    tag:str
  
 
 class CommentsResponseBase(BaseModel):
@@ -37,6 +38,7 @@ class CommentsResponseBase(BaseModel):
     post_id: int
     owner_id:int
     content:str
+    tag:str
     created_at: datetime
     owner: UserOut
 

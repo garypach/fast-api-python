@@ -27,6 +27,8 @@ class Comment(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
     owner_id = Column(Integer, ForeignKey("users.id",ondelete="CASCADE") , nullable=False)
     owner = relationship("User")
+    tag = Column(String, nullable=False,server_default=text('Enhancement'))
+
 
 class User(Base):
     __tablename__ = "users"
