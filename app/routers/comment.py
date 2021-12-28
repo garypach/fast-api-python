@@ -26,8 +26,8 @@ async def get_comments(id:int, db: Session = Depends(get_db), current_user: int 
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
     results = db.query(models.Comment).filter(models.Comment.post_id == id).limit(limit).all()
-    
     return results
+
 
 @router.get("/comment/{id}", response_model= schemas.CommentsResponseBase)
 def get_one_comment(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):

@@ -29,6 +29,15 @@ class Comment(Base):
     owner = relationship("User")
     tag = Column(String, nullable=False,server_default=text('Enhancement'))
 
+class Reply(Base):
+    __tablename__ = "replys"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    comment_id = Column(Integer, ForeignKey("comments.id",ondelete="CASCADE"))
+    content = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
+    owner_id = Column(Integer, ForeignKey("users.id",ondelete="CASCADE") , nullable=False)
+    owner = relationship("User")
 
 class User(Base):
     __tablename__ = "users"

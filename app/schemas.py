@@ -31,6 +31,21 @@ class Comments(BaseModel):
     post_id:int
     tag:str
  
+class Replys(BaseModel):
+    content:str  
+    comment_id:int 
+
+class ReplysResponseBase(BaseModel):
+    id: int
+    comment_id: int
+    owner_id:int
+    content:str
+    created_at: datetime
+    owner: UserOut
+
+    class Config:
+        orm_mode = True
+
 
 class CommentsResponseBase(BaseModel):
     id: int
