@@ -25,8 +25,6 @@ def get_comment_replys(id:int,db: Session = Depends(get_db), current_user: int =
     # cursor.execute("""SELECT * from posts WHERE id = %s""" , (str(id)))
     # post = cursor.fetchone()
     comment = db.query(models.Reply).filter(models.Reply.comment_id == id).all()
-    if not comment:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"comment with id: {id} was not found")
     return comment
 
 

@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response,status,HTTPException
 
 from . import models,schemas,utils
 from .database import engine, get_db
-from .routers import posts, users,auth,vote,comment,reply
+from .routers import posts, users,auth,vote,comment,reply,comment_vote
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -32,6 +32,7 @@ app.include_router(auth.router)
 app.include_router(vote.router)
 app.include_router(comment.router)
 app.include_router(reply.router)
+app.include_router(comment_vote.router)
 
 
 

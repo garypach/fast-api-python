@@ -63,6 +63,8 @@ class CommentsResponseBase(BaseModel):
 
 class CommentsOut(BaseModel):
     Comment:CommentsResponseBase
+    commentvotes:int
+    replies:int
 
 
     
@@ -82,6 +84,7 @@ class ResponseBase(BaseModel):
 class PostOut(BaseModel):
     Post:ResponseBase
     votes:int
+    comments:int
 
 
 class UserCreate(BaseModel):
@@ -104,3 +107,8 @@ class TokenData(BaseModel):
 class Vote(BaseModel):
     post_id: int
     dir: conint(le=1)
+
+class CommentVote(BaseModel):
+    comment_id: int
+    dir: conint(le=1)
+

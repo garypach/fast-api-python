@@ -52,3 +52,9 @@ class Vote(Base):
 
     user_id = Column(Integer, ForeignKey("users.id",ondelete="CASCADE") , primary_key=True)
     post_id = Column(Integer, ForeignKey("posts.id",ondelete="CASCADE") , primary_key=True)
+
+class CommentVote(Base):
+    __tablename__ = "commentvotes"
+
+    user_id = Column(Integer, ForeignKey("users.id",ondelete="CASCADE") , primary_key=True)
+    comment_id = Column(Integer, ForeignKey("comments.id",ondelete="CASCADE") , primary_key=True)

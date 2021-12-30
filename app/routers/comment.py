@@ -21,19 +21,19 @@ router = APIRouter(
 )
 
 #get all comments for a post
-@router.get("/{id}",  response_model= List[schemas.CommentsResponseBase])
+@router.get("/{id}",  response_model= List[schemas.CommentsOut])
 async def get_comments(id:int, db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user), limit:int = 5, skip:int = 0, search: Optional[str]=""):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
-    results = db.query(models.Comment).filter(models.Comment.post_id == id).limit(limit).all()
+    results = db.query(models.Comment,func.count(models.CommentVote.comment_id).label("commentvotes"),func.count(models.Reply.comment_id).label("replies")).join(models.Reply,models.Reply.comment_id == models.Comment.id, isouter=True).join(models.CommentVote,models.CommentVote.comment_id == models.Comment.id, isouter=True).group_by(models.Comment.id).filter(models.Comment.post_id == id).limit(limit).all()
     return results
 
 
-@router.get("/comment/{id}", response_model= schemas.CommentsResponseBase)
+@router.get("/comment/{id}", response_model= schemas.CommentsOut)
 def get_one_comment(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
     # cursor.execute("""SELECT * from posts WHERE id = %s""" , (str(id)))
     # post = cursor.fetchone()
-    comment = db.query(models.Comment).filter(models.Comment.id == id).first()
+    comment = db.query(models.Comment,func.count(models.CommentVote.comment_id).label("commentvotes"),func.count(models.Reply.comment_id).label("replies")).join(models.Reply,models.Reply.comment_id == models.Comment.id, isouter=True).join(models.CommentVote,models.CommentVote.comment_id == models.Comment.id, isouter=True).group_by(models.Comment.id).filter(models.Comment.id == id).first()
     if not comment:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"comment with id: {id} was not found")
     return comment
@@ -57,7 +57,7 @@ async def create_comment(comment:schemas.Comments, db: Session = Depends(get_db)
     return new_comment
 
 @router.put("/{id}")
-def update_post(id:int, comment: schemas.Comments,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
+def update_comment(id:int, comment: schemas.Comments,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
     # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""" , (post.title,post.content,post.published,str(id)))
     # updated_post =  cursor.fetchone()
     # conn.commit()
@@ -76,7 +76,7 @@ def update_post(id:int, comment: schemas.Comments,db: Session = Depends(get_db),
     return comment_query.first()
 
 @router.delete("/{id}",status_code= status.HTTP_204_NO_CONTENT)
-def delete_post(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
+def delete_comment(id:int,db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
     # deleting post
     # find index of id
     # pop value from array
